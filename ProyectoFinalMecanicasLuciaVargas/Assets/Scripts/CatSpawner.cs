@@ -1,15 +1,29 @@
-using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
 
 public class CatSpawner : MonoBehaviour
 {
+    [Header("Configuración de spawn")]
     public GameObject catPrefab;
-    public Transform spawnPoint;
-    public Transform pathParent;
-    public float spawnInterval = 2f;
+    public float spawnInterval = 4f;
+    public int maxCatsInScene = 3;
 
-    private void Start()
+    [Header("Referencias")]
+    public QueueManager queueManager;
+    public WaypointPath waypointPath;
+
+    private List<GameObject> activeCats = new List<GameObject>();
+
+    IEnumerator Start()
     {
+        yield return null;
+
+        if (queueManager == null)
+            queueManager = FindObjectOfType<QueueManager>();
+        if (waypointPath == null)
+            waypointPath = FindObjectOfType<WaypointPath>();
+
         StartCoroutine(SpawnRoutine());
     }
 
@@ -17,18 +31,22 @@ public class CatSpawner : MonoBehaviour
     {
         while (true)
         {
-            if (!QueueManager.Instance.IsQueueFull())
-                SpawnCat();
             yield return new WaitForSeconds(spawnInterval);
+
+            activeCats.RemoveAll(c => c == null);
+
+            if (activeCats.Count < maxCatsInScene)
+                SpawnCat();
         }
     }
 
     void SpawnCat()
     {
-        GameObject cat = Instantiate(catPrefab, spawnPoint.position, Quaternion.identity);
-        CatMovement movement = cat.GetComponent<CatMovement>();
+        GameObject cat = Instantiate(catPrefab, transform.position, transform.rotation);
+        activeCats.Add(cat);
 
-        foreach (Transform wp in pathParent)
-            movement.waypoints.Add(wp);
+        CatMover mover = cat.GetComponent<CatMover>();
+        if (mover != null)
+            mover.Initialize(queueManager, waypointPath);
     }
 }
