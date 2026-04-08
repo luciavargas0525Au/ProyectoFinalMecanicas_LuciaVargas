@@ -33,11 +33,20 @@ public class CatMovement : MonoBehaviour
         if (Vector3.Distance(transform.position, target.position) < 0.05f)
         {
             currentWaypoint++;
-            if (currentWaypoint >= waypoints.Count)
+            if(currentWaypoint >= waypoints.Count)
             {
                 // Llegó al final, pasa a la cola
                 inQueue = true;
-                transform.position = target.position; // asegúrate que quede exacto
+
+                // Fijar posición exacta
+                Vector3 finalPos = target.position;
+                finalPos.y = 0.87f; // fuerza la altura correcta
+                transform.position = finalPos;
+
+                // Desactivar Rigidbody si lo hay
+                Rigidbody rb = GetComponent<Rigidbody>();
+                if (rb) rb.isKinematic = true;
+
                 QueueManager.Instance.AddToQueue(this);
             }
         }
