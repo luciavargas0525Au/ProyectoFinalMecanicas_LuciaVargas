@@ -1,12 +1,13 @@
 using UnityEngine;
 using TMPro;
+using UnityEngine.UI; 
 
 public class OrderBubble : MonoBehaviour
 {
     [Header("Referencias")]
     public GameObject bubbleObject;
     public TextMeshProUGUI recipeText;
-    public SpriteRenderer recipeIcon;
+    public Image recipeIcon; 
 
     [Header("Recetas disponibles")]
     public string[] recipeNames = { "Salmon", "Pollo", "Leche" };
@@ -28,7 +29,7 @@ public class OrderBubble : MonoBehaviour
             recipeText.text = recipeNames[assignedRecipe];
 
         if (recipeIcon != null && recipeSprites != null && assignedRecipe < recipeSprites.Length)
-            recipeIcon.sprite = recipeSprites[assignedRecipe];
+            recipeIcon.sprite = recipeSprites[assignedRecipe]; 
 
         if (bubbleObject != null)
             bubbleObject.SetActive(true);
